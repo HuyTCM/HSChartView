@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		54D40CA21D916B2F00B75009 /* HSLineChartView.m in Sources */ = {isa = PBXBuildFile; fileRef = 54D40CA11D916B2F00B75009 /* HSLineChartView.m */; };
+		54D40CA61D916D7200B75009 /* CommonUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 54D40CA51D916D7200B75009 /* CommonUtils.m */; };
 		928986371D8FEAC30080F5D9 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 928986361D8FEAC30080F5D9 /* main.m */; };
 		9289863A1D8FEAC30080F5D9 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 928986391D8FEAC30080F5D9 /* AppDelegate.m */; };
 		9289863D1D8FEAC30080F5D9 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9289863C1D8FEAC30080F5D9 /* ViewController.m */; };
@@ -16,7 +18,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		928986321D8FEAC30080F5D9 /* Account.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Account.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		54D40CA01D916B2F00B75009 /* HSLineChartView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HSLineChartView.h; sourceTree = "<group>"; };
+		54D40CA11D916B2F00B75009 /* HSLineChartView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HSLineChartView.m; sourceTree = "<group>"; };
+		54D40CA41D916D7200B75009 /* CommonUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonUtils.h; sourceTree = "<group>"; };
+		54D40CA51D916D7200B75009 /* CommonUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommonUtils.m; sourceTree = "<group>"; };
+		928986321D8FEAC30080F5D9 /* HSChartView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HSChartView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		928986361D8FEAC30080F5D9 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		928986381D8FEAC30080F5D9 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		928986391D8FEAC30080F5D9 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -39,10 +45,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		54D40CA31D916D4D00B75009 /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				54D40CA41D916D7200B75009 /* CommonUtils.h */,
+				54D40CA51D916D7200B75009 /* CommonUtils.m */,
+			);
+			name = Common;
+			sourceTree = "<group>";
+		};
 		928986291D8FEAC20080F5D9 = {
 			isa = PBXGroup;
 			children = (
-				928986341D8FEAC30080F5D9 /* Account */,
+				928986341D8FEAC30080F5D9 /* HSChartView */,
 				928986331D8FEAC30080F5D9 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -50,14 +65,17 @@
 		928986331D8FEAC30080F5D9 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				928986321D8FEAC30080F5D9 /* Account.app */,
+				928986321D8FEAC30080F5D9 /* HSChartView.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		928986341D8FEAC30080F5D9 /* Account */ = {
+		928986341D8FEAC30080F5D9 /* HSChartView */ = {
 			isa = PBXGroup;
 			children = (
+				54D40CA31D916D4D00B75009 /* Common */,
+				54D40CA01D916B2F00B75009 /* HSLineChartView.h */,
+				54D40CA11D916B2F00B75009 /* HSLineChartView.m */,
 				928986381D8FEAC30080F5D9 /* AppDelegate.h */,
 				928986391D8FEAC30080F5D9 /* AppDelegate.m */,
 				9289863B1D8FEAC30080F5D9 /* ViewController.h */,
@@ -68,7 +86,7 @@
 				928986461D8FEAC30080F5D9 /* Info.plist */,
 				928986351D8FEAC30080F5D9 /* Supporting Files */,
 			);
-			path = Account;
+			path = HSChartView;
 			sourceTree = "<group>";
 		};
 		928986351D8FEAC30080F5D9 /* Supporting Files */ = {
@@ -82,9 +100,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		928986311D8FEAC30080F5D9 /* Account */ = {
+		928986311D8FEAC30080F5D9 /* HSChartView */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 928986491D8FEAC30080F5D9 /* Build configuration list for PBXNativeTarget "Account" */;
+			buildConfigurationList = 928986491D8FEAC30080F5D9 /* Build configuration list for PBXNativeTarget "HSChartView" */;
 			buildPhases = (
 				9289862E1D8FEAC30080F5D9 /* Sources */,
 				9289862F1D8FEAC30080F5D9 /* Frameworks */,
@@ -94,9 +112,9 @@
 			);
 			dependencies = (
 			);
-			name = Account;
+			name = HSChartView;
 			productName = Account;
-			productReference = 928986321D8FEAC30080F5D9 /* Account.app */;
+			productReference = 928986321D8FEAC30080F5D9 /* HSChartView.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -113,7 +131,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 9289862D1D8FEAC20080F5D9 /* Build configuration list for PBXProject "Account" */;
+			buildConfigurationList = 9289862D1D8FEAC20080F5D9 /* Build configuration list for PBXProject "HSChartView" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -126,7 +144,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				928986311D8FEAC30080F5D9 /* Account */,
+				928986311D8FEAC30080F5D9 /* HSChartView */,
 			);
 		};
 /* End PBXProject section */
@@ -149,6 +167,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				54D40CA21D916B2F00B75009 /* HSLineChartView.m in Sources */,
+				54D40CA61D916D7200B75009 /* CommonUtils.m in Sources */,
 				9289863D1D8FEAC30080F5D9 /* ViewController.m in Sources */,
 				9289863A1D8FEAC30080F5D9 /* AppDelegate.m in Sources */,
 				928986371D8FEAC30080F5D9 /* main.m in Sources */,
@@ -263,9 +283,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				INFOPLIST_FILE = Account/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/HSChartView/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.huytcm.Account;
+				PRODUCT_BUNDLE_IDENTIFIER = com.huytcm.HSChartView;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -274,9 +294,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				INFOPLIST_FILE = Account/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/HSChartView/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.huytcm.Account;
+				PRODUCT_BUNDLE_IDENTIFIER = com.huytcm.HSChartView;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -284,7 +304,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		9289862D1D8FEAC20080F5D9 /* Build configuration list for PBXProject "Account" */ = {
+		9289862D1D8FEAC20080F5D9 /* Build configuration list for PBXProject "HSChartView" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				928986471D8FEAC30080F5D9 /* Debug */,
@@ -293,13 +313,14 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		928986491D8FEAC30080F5D9 /* Build configuration list for PBXNativeTarget "Account" */ = {
+		928986491D8FEAC30080F5D9 /* Build configuration list for PBXNativeTarget "HSChartView" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9289864A1D8FEAC30080F5D9 /* Debug */,
 				9289864B1D8FEAC30080F5D9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

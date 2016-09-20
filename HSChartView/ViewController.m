@@ -6,10 +6,11 @@
 //  Copyright © 2016 huytcm. All rights reserved.
 //
 
+#import "CommonUtils.h"
 #import "ViewController.h"
-#import "HSChartView.h"
+#import "HSLineChartView.h"
 
-@interface ViewController () <HSChartViewDataSource>
+@interface ViewController () <HSLineChartViewDataSource, HSLineChartViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UIImageView *avaImage;
 
@@ -38,31 +39,39 @@
     [self.pointArr1 addObject:[NSValue valueWithCGPoint:CGPointMake(35, 38)]];
     [self.pointArr1 addObject:[NSValue valueWithCGPoint:CGPointMake(45, 42)]];
     
-    HSChartView *chartView = [[HSChartView alloc] initWithFrame:CGRectMake(20, 20, 128, 128)];
-    chartView.backgroundColor = [UIColor clearColor];
+    HSLineChartView *chartView = [[HSLineChartView alloc] initWithFrame:CGRectMake(20, 20, 128, 128)];
+    chartView.delegate = self;
     chartView.dataSource = self;
     [self.view addSubview:chartView];
     
     self.avaImage.layer.cornerRadius = 128/2;
 }
 
--(NSInteger)chartView:(HSChartView *)chartView numberOfValueInLine:(NSInteger)line {
+-(NSInteger)chartView:(HSLineChartView *)chartView numberOfValueInLine:(NSInteger)line {
     if (line == 1) {
         return [self.pointArr1 count];
     }
     return [self.pointArr count];
 }
 
--(NSValue *)chartView:(HSChartView *)chartView valueAtIndex:(NSInteger)index inLine:(NSInteger)line {
+-(NSValue *)chartView:(HSLineChartView *)chartView valueAtIndex:(NSInteger)index inLine:(NSInteger)line {
     if (line == 1) {
         return [self.pointArr1 objectAtIndex:index];
     }
     return [self.pointArr objectAtIndex:index];
 }
 
--(NSInteger)numberOfLineInChartView:(HSChartView *)chartView {
+-(NSInteger)numberOfLineInChartView:(HSLineChartView *)chartView {
     return 2;
 }
+
+-(UIColor *)colorOfLine:(NSInteger)line {
+    if (line == 1) {
+        return [UIColor greenColor];
+    }
+    return [UIColor redColor];
+}
+    
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
