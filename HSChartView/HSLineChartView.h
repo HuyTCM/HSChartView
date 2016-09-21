@@ -14,6 +14,7 @@
     @property (nonatomic, weak, nullable) id <HSLineChartViewDataSource> dataSource;
     @property (nonatomic, weak, nullable) id <HSLineChartViewDelegate> delegate;
     @property (nonatomic, nullable) UIColor *axisColor;
+    @property (nonatomic) CGFloat lineWidth; // default 1.0f
 @end
 
 @protocol HSLineChartViewDataSource<NSObject>

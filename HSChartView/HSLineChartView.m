@@ -10,6 +10,8 @@
 
 @interface HSLineChartView()
     @property (nonatomic) CGFloat padding;
+    @property (nonatomic) CGPoint rootPoint;
+    @property (nonatomic) CGFloat axisMargin;
 @end
 
 @implementation HSLineChartView
@@ -19,6 +21,8 @@
         self.backgroundColor = [UIColor whiteColor];
         self.axisColor = [UIColor blackColor];
         self.padding = 10.0f;
+        self.lineWidth = 1.0f;
+        self.axisMargin = self.lineWidth/2;
     }
     return self;
 }
@@ -32,24 +36,16 @@
     CGContextFillRect(context, self.bounds);
     
     CGContextSetStrokeColorWithColor(context, [self.axisColor CGColor]);
-    CGContextSetLineWidth(context, 1.0);
+    CGContextSetLineWidth(context, self.lineWidth);
     
-    CGPoint rootO = CGPointMake(rect.origin.x + self.padding, rect.size.height - self.padding);
+    self.rootPoint = CGPointMake(rect.origin.x + self.padding, rect.size.height - self.padding);
     
-    // x axis
-    CGContextMoveToPoint(context, rootO.x, rootO.y);
-    CGContextAddLineToPoint(context, 10, 10);
-    CGContextDrawPath(context, kCGPathStroke);
-    
-    // y axis
-    CGContextMoveToPoint(context, rootO.x, rootO.y);
-    CGContextAddLineToPoint(context, rect.size.width - 10, rect.size.height - 10);
-    CGContextDrawPath(context, kCGPathStroke);
+    [self drawAxisAtRoot:self.rootPoint inContenxt:context rect:rect];
     
     CGContextSetStrokeColorWithColor(context, CGColorCreateCopyWithAlpha([self.axisColor CGColor], 0.3f));
-    CGContextSetLineWidth(context, 0.1f);
+    CGContextSetLineWidth(context, self.lineWidth/10.0f);
     
-    CGFloat currentX = rootO.x + 10; // from x line + 10
+    CGFloat currentX = self.rootPoint.x + 10; // from x line + 10
     while (currentX < (rect.size.width - 10)) {
         CGContextMoveToPoint(context, currentX, rect.size.height - 10);
         CGPoint pt = CGContextGetPathCurrentPoint(context);
@@ -58,7 +54,7 @@
         currentX += 10.0f;
     }
     
-    CGFloat currentY = rootO.y - 10; // from y line - 10
+    CGFloat currentY = self.rootPoint.y - 10; // from y line - 10
     while (currentY > 10) {
         CGContextMoveToPoint(context, rect.origin.x + 10, currentY);
         CGPoint pt = CGContextGetPathCurrentPoint(context);
@@ -74,31 +70,55 @@
         numOfLine = 1;
     }
     
-    UIColor *lineColor;
     while (numOfLine > 0) {
-        if ([self.delegate respondsToSelector:@selector(colorOfLine:)]) {
-            lineColor = [self.delegate colorOfLine:numOfLine];
-        }
-        if (!lineColor) {
-            lineColor = self.axisColor;
-        }
-        
-        CGContextSetStrokeColorWithColor(context, [lineColor CGColor]);
-        CGContextSetLineWidth(context, 1.0f);
-        // move to root O
-        CGContextMoveToPoint(context, rootO.x, rootO.y);
-        CGPoint currPoint = CGContextGetPathCurrentPoint(context);
-        
-        for (int i = 0; i < [self.dataSource chartView:self numberOfValueInLine:numOfLine]; i++) {
-            NSValue *pointValue = [self.dataSource chartView:self valueAtIndex:i inLine:numOfLine];
-            CGPoint point = [pointValue CGPointValue];
-            CGContextMoveToPoint(context, currPoint.x, currPoint.y);
-            CGContextAddLineToPoint(context, rootO.x + point.x, rootO.y - point.y);
-            currPoint = CGContextGetPathCurrentPoint(context);
-            CGContextDrawPath(context, kCGPathStroke);
-        }
+        CGLayerRef lineLayer = [self drawLine:numOfLine rect:rect inContextRef:context];
+        CGContextDrawLayerAtPoint(context, CGPointZero, lineLayer);
+        CGLayerRelease(lineLayer);
         --numOfLine;
     }
+}
+
+- (void)drawAxisAtRoot:(CGPoint)rootPoint inContenxt:(CGContextRef)context rect:(CGRect)rect {
+    CGFloat axisMargin = self.lineWidth / 2;
+    // x axis
+    // point x of X axis was substract to lineWidth to fill the space between two axises.
+    CGContextMoveToPoint(context, rootPoint.x - self.lineWidth, rootPoint.y + axisMargin);
+    CGContextAddLineToPoint(context, rect.size.width - self.padding, rect.size.height - self.padding + axisMargin);
+    CGContextDrawPath(context, kCGPathStroke);
+    
+    // y axis
+    CGContextMoveToPoint(context, rootPoint.x - axisMargin, rootPoint.y);
+    CGContextAddLineToPoint(context, self.padding - axisMargin , self.padding);
+    CGContextDrawPath(context, kCGPathStroke);
+}
+
+- (CGLayerRef)drawLine:(NSInteger)line rect:(CGRect)rect inContextRef:(CGContextRef)context {
+    CGLayerRef layer = CGLayerCreateWithContext(context, rect.size, NULL);
+    CGContextRef layerContext = CGLayerGetContext(layer);
+    
+    UIColor *lineColor;
+    if ([self.delegate respondsToSelector:@selector(colorOfLine:)]) {
+        lineColor = [self.delegate colorOfLine:line];
+    }
+    if (!lineColor) {
+        lineColor = self.axisColor;
+    }
+    
+    CGContextSetStrokeColorWithColor(layerContext, [lineColor CGColor]);
+    CGContextSetLineWidth(layerContext, self.lineWidth);
+    // move to root O
+    CGContextMoveToPoint(layerContext, self.rootPoint.x, self.rootPoint.y);
+    CGPoint currPoint = CGContextGetPathCurrentPoint(layerContext);
+    
+    for (int i = 0; i < [self.dataSource chartView:self numberOfValueInLine:line]; i++) {
+        NSValue *pointValue = [self.dataSource chartView:self valueAtIndex:i inLine:line];
+        CGPoint point = [pointValue CGPointValue];
+        CGContextMoveToPoint(layerContext, currPoint.x, currPoint.y);
+        CGContextAddLineToPoint(layerContext, self.rootPoint.x + point.x, self.rootPoint.y - point.y);
+        currPoint = CGContextGetPathCurrentPoint(layerContext);
+        CGContextDrawPath(layerContext, kCGPathStroke);
+    }
+    return layer;
 }
 
 @end
