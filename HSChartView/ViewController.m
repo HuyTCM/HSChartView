@@ -39,9 +39,14 @@
     [self.pointArr1 addObject:[NSValue valueWithCGPoint:CGPointMake(35, 38)]];
     [self.pointArr1 addObject:[NSValue valueWithCGPoint:CGPointMake(45, 42)]];
     
-    HSLineChartView *chartView = [[HSLineChartView alloc] initWithFrame:CGRectMake(20, 20, 128, 128)];
+    HSLineChartView *chartView = [[HSLineChartView alloc] initWithFrame:CGRectMake(20, 20, 256, 256)];
     chartView.delegate = self;
     chartView.dataSource = self;
+    [chartView setBackgroundColor:[CommonUtils colorWithR:255.0f G:247.0f B:234.0f alpha:1.0f]];
+    [chartView setAxisColor:[CommonUtils colorWithR:238.0f G:167.0f B:59.0f alpha:1.0f]];
+    [chartView setLineWidth:10.0f];
+    [chartView setVerticalLabel:@"Week"];
+    [chartView setHorizontalLabel:@"Kg"];
     [self.view addSubview:chartView];
     
     self.avaImage.layer.cornerRadius = 128/2;
@@ -62,7 +67,7 @@
 }
 
 -(NSInteger)numberOfLineInChartView:(HSLineChartView *)chartView {
-    return 2;
+    return 1;
 }
 
 -(UIColor *)colorOfLine:(NSInteger)line {

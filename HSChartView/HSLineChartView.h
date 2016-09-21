@@ -15,6 +15,14 @@
     @property (nonatomic, weak, nullable) id <HSLineChartViewDelegate> delegate;
     @property (nonatomic, nullable) UIColor *axisColor;
     @property (nonatomic) CGFloat lineWidth; // default 1.0f
+    @property (nonatomic, readonly) CGFloat maxVerticalValue;
+    @property (strong, nonatomic, nullable) NSString *verticalLabel;
+    @property (nonatomic, readonly) CGFloat maxHorizontalValue;
+    @property (strong, nonatomic, nullable) NSString *horizontalLabel;
+
+    // label font
+    @property (nonatomic) CGFloat fontSize;
+
 @end
 
 @protocol HSLineChartViewDataSource<NSObject>
