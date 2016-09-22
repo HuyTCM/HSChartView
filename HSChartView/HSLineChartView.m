@@ -11,6 +11,7 @@
 #define kDefaultPadding         10.0f
 #define kDefaultLineWidth       1.0f
 #define kDefaultFontSize        8.0f
+#define kDefaultUnitWidth       10
 
 @interface HSLineChartView()
 
@@ -26,6 +27,7 @@
 @end
 
 @implementation HSLineChartView
+@synthesize delegate;
 
 - (id)initWithFrame:(CGRect)frame {
     if (self = [super initWithFrame:frame]) {
@@ -38,8 +40,10 @@
         self.fontSize = kDefaultFontSize;
         self.paddingLeft = self.paddingRight = self.paddingTop = self.paddingBottom = kDefaultPadding;
         self.lineWidth = kDefaultLineWidth;
+        self.horizontalUnitWidth = self.verticalUnitWidth = kDefaultUnitWidth;
         self.axisMargin = self.lineWidth/2;
     }
+    [self setContentSize:frame.size];
     return self;
 }
 
@@ -59,7 +63,9 @@
     self.rootPoint = CGPointMake(rect.origin.x + self.paddingLeft, rect.size.height - self.paddingBottom);
     
     [self drawAxisAtRoot:self.rootPoint inContenxt:context];
-    [self drawSeparateLineWithStep:10.0f inContext:context];
+    [self drawSeparateLineWithHorizonralUnitWidth:self.horizontalUnitWidth
+                                verticalUnitWidth:self.verticalUnitWidth
+                                        inContext:context];
     
     NSInteger numOfLine;
     if ([self.delegate respondsToSelector:@selector(numberOfLineInChartView:)]) {
@@ -99,7 +105,7 @@
     // x axis
     // point x of X axis was substract to lineWidth to fill the space between two axises.
     CGContextMoveToPoint(context, rootPoint.x - self.lineWidth, rootPoint.y + axisMargin);
-    CGContextAddLineToPoint(context, self.bounds.size.width - self.paddingRight, self.bounds.size.height - self.paddingBottom + axisMargin);
+    CGContextAddLineToPoint(context, self.bounds.size.width - self.paddingRight + 100, self.bounds.size.height - self.paddingBottom + axisMargin);
     CGContextDrawPath(context, kCGPathStroke);
     
     // y axis
@@ -108,26 +114,26 @@
     CGContextDrawPath(context, kCGPathStroke);
 }
 
-- (void)drawSeparateLineWithStep:(CGFloat)step inContext:(CGContextRef)context {
+- (void)drawSeparateLineWithHorizonralUnitWidth:(CGFloat)hw verticalUnitWidth:(CGFloat)vw inContext:(CGContextRef)context {
     CGContextSetStrokeColorWithColor(context, CGColorCreateCopyWithAlpha([self.axisColor CGColor], 0.3f));
     CGContextSetLineWidth(context, self.lineWidth/10.0f);
     
-    CGFloat currentX = self.rootPoint.x + step; // from x line + 10
-    while (currentX < (self.bounds.size.width - step)) {
+    CGFloat currentX = self.rootPoint.x + hw; // from x line + 10
+    while (currentX < (self.bounds.size.width - hw)) {
         CGContextMoveToPoint(context, currentX, self.rootPoint.y);
         CGPoint pt = CGContextGetPathCurrentPoint(context);
-        CGContextAddLineToPoint(context, pt.x, step);
+        CGContextAddLineToPoint(context, pt.x, hw);
         CGContextDrawPath(context, kCGPathStroke);
-        currentX += step;
+        currentX += hw;
     }
     
-    CGFloat currentY = self.rootPoint.y - step; // from y line - 10
-    while (currentY > step) {
+    CGFloat currentY = self.rootPoint.y - vw; // from y line - 10
+    while (currentY > vw) {
         CGContextMoveToPoint(context, self.rootPoint.x, currentY);
         CGPoint pt = CGContextGetPathCurrentPoint(context);
-        CGContextAddLineToPoint(context, self.bounds.size.width - step, pt.y);
+        CGContextAddLineToPoint(context, self.bounds.size.width - vw, pt.y);
         CGContextDrawPath(context, kCGPathStroke);
-        currentY -= step;
+        currentY -= vw;
     }
 }
 
