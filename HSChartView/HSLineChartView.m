@@ -24,6 +24,9 @@
     @property (nonatomic) CGPoint verticalLabelPoint;
     @property (nonatomic) CGPoint horizontalLabelPoint;
 
+    @property (nonatomic) CGFloat maxXValue;
+    @property (nonatomic) CGFloat maxYValue;
+
 @end
 
 @implementation HSLineChartView
@@ -55,17 +58,13 @@
     CGContextSetFillColorWithColor(context, [self.backgroundColor CGColor]);
     CGContextFillRect(context, self.bounds);
     
-    [self drawLabel];
+    CGRect verticalLabelRect = [self drawLabel:self.verticalLabel fontSize:self.fontSize atPoint:self.verticalLabelPoint onHorizontal:NO];
+    CGRect horizontalLabelRect = [self drawLabel:self.horizontalLabel fontSize:self.fontSize atPoint:self.horizontalLabelPoint onHorizontal:YES];
     
-    CGContextSetStrokeColorWithColor(context, [self.axisColor CGColor]);
-    CGContextSetLineWidth(context, self.lineWidth);
+    self.paddingLeft = verticalLabelRect.size.width + kDefaultPadding + self.lineWidth;
+    self.paddingBottom = horizontalLabelRect.size.height + kDefaultPadding + self.lineWidth;
     
     self.rootPoint = CGPointMake(rect.origin.x + self.paddingLeft, rect.size.height - self.paddingBottom);
-    
-    [self drawAxisAtRoot:self.rootPoint inContenxt:context];
-    [self drawSeparateLineWithHorizonralUnitWidth:self.horizontalUnitWidth
-                                verticalUnitWidth:self.verticalUnitWidth
-                                        inContext:context];
     
     NSInteger numOfLine;
     if ([self.delegate respondsToSelector:@selector(numberOfLineInChartView:)]) {
@@ -80,37 +79,45 @@
         CGLayerRelease(lineLayer);
         --numOfLine;
     }
+    
+    // draw X,Y - axis with root point O
+    CGContextSetStrokeColorWithColor(context, [self.axisColor CGColor]);
+    CGContextSetLineWidth(context, self.lineWidth);
+    
+    [self drawAxisInRect:rect atRoot:self.rootPoint inContenxt:context];
+    [self drawSeparateLineWithHorizonralUnitWidth:self.horizontalUnitWidth
+                                verticalUnitWidth:self.verticalUnitWidth
+                                        inContext:context];
 }
 
-- (void)drawLabel {
+- (CGRect)drawLabel:(NSString *)label fontSize:(CGFloat)fontSize atPoint:(CGPoint)point onHorizontal:(BOOL)horizontal {
     // Draw label
-    NSDictionary *labelAttributes = @{NSFontAttributeName:[UIFont systemFontOfSize:self.fontSize]};
+    NSDictionary *labelAttributes = @{NSFontAttributeName:[UIFont systemFontOfSize:fontSize]};
     
-    CGSize verticalLabelSize = [self.verticalLabel sizeWithAttributes:labelAttributes];
-    CGSize horizontalLabelSize = [self.horizontalLabel sizeWithAttributes:labelAttributes];
-    CGRect verticalRect = CGRectMake(self.verticalLabelPoint.x, self.verticalLabelPoint.y, verticalLabelSize.width, verticalLabelSize.height);
-    CGRect horizontalRect = CGRectMake(self.horizontalLabelPoint.x - horizontalLabelSize.width,
-                                       self.horizontalLabelPoint.y - horizontalLabelSize.height,
-                                       horizontalLabelSize.width, horizontalLabelSize.height);
+    CGSize size = [label sizeWithAttributes:labelAttributes];
+    CGRect rect;
+    if(!horizontal) {
+        rect = CGRectMake(point.x, point.y, size.width, size.height);
+    } else {
+        rect = CGRectMake(point.x - size.width/2, point.y - size.height/2, size.width, size.height);
+    }
     
-    [self.verticalLabel drawInRect:verticalRect withAttributes:labelAttributes];
-    [self.horizontalLabel drawInRect:horizontalRect withAttributes:labelAttributes];
+    [label drawInRect:rect withAttributes:labelAttributes];
     
-    self.paddingLeft = verticalLabelSize.width + kDefaultPadding + self.lineWidth;
-    self.paddingBottom = horizontalLabelSize.height + kDefaultPadding + self.lineWidth;
+    return rect;
 }
 
-- (void)drawAxisAtRoot:(CGPoint)rootPoint inContenxt:(CGContextRef)context {
+- (void)drawAxisInRect:(CGRect)rect atRoot:(CGPoint)rootPoint inContenxt:(CGContextRef)context {
     CGFloat axisMargin = self.lineWidth / 2;
     // x axis
     // point x of X axis was substract to lineWidth to fill the space between two axises.
     CGContextMoveToPoint(context, rootPoint.x - self.lineWidth, rootPoint.y + axisMargin);
-    CGContextAddLineToPoint(context, self.bounds.size.width - self.paddingRight + 100, self.bounds.size.height - self.paddingBottom + axisMargin);
+    CGContextAddLineToPoint(context, self.maxXValue + self.paddingLeft + kDefaultPadding, self.bounds.size.height - self.paddingBottom + axisMargin);
     CGContextDrawPath(context, kCGPathStroke);
     
     // y axis
     CGContextMoveToPoint(context, rootPoint.x - axisMargin, rootPoint.y);
-    CGContextAddLineToPoint(context, self.paddingLeft - axisMargin , self.paddingTop);
+    CGContextAddLineToPoint(context, self.paddingLeft - axisMargin , rootPoint.y - (self.maxYValue + kDefaultPadding));
     CGContextDrawPath(context, kCGPathStroke);
 }
 
@@ -118,21 +125,36 @@
     CGContextSetStrokeColorWithColor(context, CGColorCreateCopyWithAlpha([self.axisColor CGColor], 0.3f));
     CGContextSetLineWidth(context, self.lineWidth/10.0f);
     
+    CGFloat ra[] = {1,1};
+    CGContextSetLineDash(context, 0.0, ra, 2);
+    
+    CGFloat fontSizeLabel = 4.0f;
+    
     CGFloat currentX = self.rootPoint.x + hw; // from x line + 10
     while (currentX < (self.bounds.size.width - hw)) {
         CGContextMoveToPoint(context, currentX, self.rootPoint.y);
         CGPoint pt = CGContextGetPathCurrentPoint(context);
         CGContextAddLineToPoint(context, pt.x, hw);
         CGContextDrawPath(context, kCGPathStroke);
+        
+        CGPoint labelPoint = CGPointMake(currentX, self.rootPoint.y + self.lineWidth * 2.5);
+        [self drawLabel:[NSString stringWithFormat:@"%d",(int) (currentX - self.rootPoint.x)] fontSize:fontSizeLabel atPoint:labelPoint onHorizontal:YES];
+        
         currentX += hw;
     }
     
+    NSDictionary *labelAttributes = @{NSFontAttributeName:[UIFont systemFontOfSize:fontSizeLabel]};
+    CGSize size = [[NSString stringWithFormat:@"%d", (int)self.bounds.size.width] sizeWithAttributes:labelAttributes];
     CGFloat currentY = self.rootPoint.y - vw; // from y line - 10
     while (currentY > vw) {
         CGContextMoveToPoint(context, self.rootPoint.x, currentY);
         CGPoint pt = CGContextGetPathCurrentPoint(context);
         CGContextAddLineToPoint(context, self.bounds.size.width - vw, pt.y);
         CGContextDrawPath(context, kCGPathStroke);
+        
+        CGPoint labelPoint = CGPointMake((self.rootPoint.x - (size.width) < 0 ? 0 : self.rootPoint.x - (size.width)) - self.lineWidth * 1.5, currentY);
+        [self drawLabel:[NSString stringWithFormat:@"%d",(int) (self.rootPoint.y - currentY)] fontSize:fontSizeLabel atPoint:labelPoint onHorizontal:NO];
+        
         currentY -= vw;
     }
 }
@@ -142,11 +164,14 @@
                                   self.bounds.size.width - (self.paddingLeft + self.paddingRight),
                                   self.bounds.size.height - (self.paddingTop + self.paddingBottom));
     
-    CGPoint rootPoint = CGPointMake(0, layerRect.size.height);
+    CGPoint rootPoint = CGPointMake(0, 0);
     
     CGLayerRef layer = CGLayerCreateWithContext(context, layerRect.size, NULL);
     CGContextRef layerContext = CGLayerGetContext(layer);
     CGContextBeginTransparencyLayer(layerContext, NULL);
+    
+    CGContextTranslateCTM(layerContext, 0, layerRect.size.height);
+    CGContextScaleCTM(layerContext, 1.0, -1.0);
     
     UIColor *lineColor;
     if ([self.delegate respondsToSelector:@selector(colorOfLine:)]) {
@@ -158,18 +183,29 @@
     CGContextSetStrokeColorWithColor(layerContext, [lineColor CGColor]);
     CGContextSetLineWidth(layerContext, kDefaultLineWidth);
     
-    // move to root O
-    CGContextMoveToPoint(layerContext, rootPoint.x, rootPoint.y);
-    CGPoint currPoint = CGContextGetPathCurrentPoint(layerContext);
+//    CGFloat ra[] = {4,2};
+//    CGContextSetLineDash(layerContext, 0.0, ra, 2);
+    
+    CGMutablePathRef pathRef = CGPathCreateMutable();
+    CGPathMoveToPoint(pathRef, nil, rootPoint.x, rootPoint.y);
+    
     
     for (int i = 0; i < [self.dataSource chartView:self numberOfValueInLine:line]; i++) {
         NSValue *pointValue = [self.dataSource chartView:self valueAtIndex:i inLine:line];
         CGPoint point = [pointValue CGPointValue];
-        CGContextMoveToPoint(layerContext, currPoint.x, currPoint.y);
-        CGContextAddLineToPoint(layerContext, point.x, rootPoint.y - point.y);
-        currPoint = CGContextGetPathCurrentPoint(layerContext);
-        CGContextDrawPath(layerContext, kCGPathFillStroke);
+        if (point.x > self.maxXValue) {
+            self.maxXValue = point.x;
+        }
+        if (point.y > self.maxYValue) {
+            self.maxYValue = point.y;
+        }
+        CGPathAddLineToPoint(pathRef, nil, point.x, point.y);
     }
+    CGContextAddPath(layerContext, pathRef);
+    CGContextStrokePath(layerContext);
+    
+    CGPathRelease(pathRef);
+    
     return layer;
 }
 

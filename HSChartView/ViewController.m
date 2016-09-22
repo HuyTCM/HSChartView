@@ -44,9 +44,9 @@
     chartView.dataSource = self;
     [chartView setBackgroundColor:[CommonUtils colorWithR:255.0f G:247.0f B:234.0f alpha:1.0f]];
     [chartView setAxisColor:[CommonUtils colorWithR:238.0f G:167.0f B:59.0f alpha:1.0f]];
-    [chartView setLineWidth:10.0f];
-    [chartView setHorizontalUnitWidth:20];
-    [chartView setVerticalUnitWidth:30];
+    [chartView setLineWidth:3.0f];
+//    [chartView setHorizontalUnitWidth:20];
+//    [chartView setVerticalUnitWidth:30];
     [chartView setVerticalLabel:@"Kg"];
     [chartView setHorizontalLabel:@"Week"];
     
