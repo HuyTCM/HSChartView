@@ -131,10 +131,10 @@
     CGFloat fontSizeLabel = 4.0f;
     
     CGFloat currentX = self.rootPoint.x + hw; // from x line + 10
-    while (currentX < (self.bounds.size.width - hw)) {
+    while (currentX < (self.rootPoint.x + self.maxXValue + hw)) {
         CGContextMoveToPoint(context, currentX, self.rootPoint.y);
         CGPoint pt = CGContextGetPathCurrentPoint(context);
-        CGContextAddLineToPoint(context, pt.x, hw);
+        CGContextAddLineToPoint(context, pt.x, self.rootPoint.y - (self.maxYValue + vw));
         CGContextDrawPath(context, kCGPathStroke);
         
         CGPoint labelPoint = CGPointMake(currentX, self.rootPoint.y + self.lineWidth * 2.5);
@@ -146,10 +146,10 @@
     NSDictionary *labelAttributes = @{NSFontAttributeName:[UIFont systemFontOfSize:fontSizeLabel]};
     CGSize size = [[NSString stringWithFormat:@"%d", (int)self.bounds.size.width] sizeWithAttributes:labelAttributes];
     CGFloat currentY = self.rootPoint.y - vw; // from y line - 10
-    while (currentY > vw) {
+    while (currentY > (self.rootPoint.y - self.maxYValue - vw)) {
         CGContextMoveToPoint(context, self.rootPoint.x, currentY);
         CGPoint pt = CGContextGetPathCurrentPoint(context);
-        CGContextAddLineToPoint(context, self.bounds.size.width - vw, pt.y);
+        CGContextAddLineToPoint(context, self.rootPoint.x + self.maxXValue + vw, pt.y);
         CGContextDrawPath(context, kCGPathStroke);
         
         CGPoint labelPoint = CGPointMake((self.rootPoint.x - (size.width) < 0 ? 0 : self.rootPoint.x - (size.width)) - self.lineWidth * 1.5, currentY);
