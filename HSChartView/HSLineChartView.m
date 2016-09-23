@@ -8,11 +8,6 @@
 
 #import "HSLineChartView.h"
 
-#define kDefaultPadding         10.0f
-#define kDefaultLineWidth       1.0f
-#define kDefaultFontSize        8.0f
-#define kDefaultUnitWidth       10
-
 @interface HSLineChartView()
 
     @property (nonatomic) CGFloat paddingLeft;
@@ -74,9 +69,18 @@
     }
     
     while (numOfLine > 0) {
-        CGLayerRef lineLayer = [self drawLine:numOfLine inContextRef:context];
-        CGContextDrawLayerAtPoint(context, CGPointMake(self.paddingLeft, self.paddingTop), lineLayer);
-        CGLayerRelease(lineLayer);
+        HSLineChartViewLine *line = [self.dataSource chartView:self lineAtIndex:numOfLine];
+        if (line) {
+            if (self.maxXValue < line.maxXValue) {
+                self.maxXValue = line.maxXValue;
+            }
+            if (self.maxYValue < line.maxYValue) {
+                self.maxYValue = line.maxYValue;
+            }
+            CGLayerRef lineLayer = [line createLayerInContextRef:context];
+            CGContextDrawLayerAtPoint(context, CGPointMake(self.paddingLeft, self.rootPoint.y - line.maxYValue), lineLayer);
+            CGLayerRelease(lineLayer);
+        }
         --numOfLine;
     }
     
@@ -157,56 +161,6 @@
         
         currentY -= vw;
     }
-}
-
-- (CGLayerRef)drawLine:(NSInteger)line inContextRef:(CGContextRef)context {
-    CGRect layerRect = CGRectMake(0, 0,
-                                  self.bounds.size.width - (self.paddingLeft + self.paddingRight),
-                                  self.bounds.size.height - (self.paddingTop + self.paddingBottom));
-    
-    CGPoint rootPoint = CGPointMake(0, 0);
-    
-    CGLayerRef layer = CGLayerCreateWithContext(context, layerRect.size, NULL);
-    CGContextRef layerContext = CGLayerGetContext(layer);
-    CGContextBeginTransparencyLayer(layerContext, NULL);
-    
-    CGContextTranslateCTM(layerContext, 0, layerRect.size.height);
-    CGContextScaleCTM(layerContext, 1.0, -1.0);
-    
-    UIColor *lineColor;
-    if ([self.delegate respondsToSelector:@selector(colorOfLine:)]) {
-        lineColor = [self.delegate colorOfLine:line];
-    }
-    if (!lineColor) {
-        lineColor = self.axisColor;
-    }
-    CGContextSetStrokeColorWithColor(layerContext, [lineColor CGColor]);
-    CGContextSetLineWidth(layerContext, kDefaultLineWidth);
-    
-//    CGFloat ra[] = {4,2};
-//    CGContextSetLineDash(layerContext, 0.0, ra, 2);
-    
-    CGMutablePathRef pathRef = CGPathCreateMutable();
-    CGPathMoveToPoint(pathRef, nil, rootPoint.x, rootPoint.y);
-    
-    
-    for (int i = 0; i < [self.dataSource chartView:self numberOfValueInLine:line]; i++) {
-        NSValue *pointValue = [self.dataSource chartView:self valueAtIndex:i inLine:line];
-        CGPoint point = [pointValue CGPointValue];
-        if (point.x > self.maxXValue) {
-            self.maxXValue = point.x;
-        }
-        if (point.y > self.maxYValue) {
-            self.maxYValue = point.y;
-        }
-        CGPathAddLineToPoint(pathRef, nil, point.x, point.y);
-    }
-    CGContextAddPath(layerContext, pathRef);
-    CGContextStrokePath(layerContext);
-    
-    CGPathRelease(pathRef);
-    
-    return layer;
 }
 
 @end

@@ -15,6 +15,7 @@
 		928986401D8FEAC30080F5D9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9289863E1D8FEAC30080F5D9 /* Main.storyboard */; };
 		928986421D8FEAC30080F5D9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 928986411D8FEAC30080F5D9 /* Assets.xcassets */; };
 		928986451D8FEAC30080F5D9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 928986431D8FEAC30080F5D9 /* LaunchScreen.storyboard */; };
+		92C594C11D94CDB30032C43F /* HSLineChartViewLine.m in Sources */ = {isa = PBXBuildFile; fileRef = 92C594C01D94CDB30032C43F /* HSLineChartViewLine.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +33,9 @@
 		928986411D8FEAC30080F5D9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		928986441D8FEAC30080F5D9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		928986461D8FEAC30080F5D9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		92C594BF1D94CDB30032C43F /* HSLineChartViewLine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HSLineChartViewLine.h; sourceTree = "<group>"; };
+		92C594C01D94CDB30032C43F /* HSLineChartViewLine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HSLineChartViewLine.m; sourceTree = "<group>"; };
+		92C594C21D94DD970032C43F /* HSLineChartConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HSLineChartConstants.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,18 +77,21 @@
 		928986341D8FEAC30080F5D9 /* HSChartView */ = {
 			isa = PBXGroup;
 			children = (
+				928986381D8FEAC30080F5D9 /* AppDelegate.h */,
+				928986391D8FEAC30080F5D9 /* AppDelegate.m */,
+				928986411D8FEAC30080F5D9 /* Assets.xcassets */,
 				54D40CA31D916D4D00B75009 /* Common */,
 				54D40CA01D916B2F00B75009 /* HSLineChartView.h */,
 				54D40CA11D916B2F00B75009 /* HSLineChartView.m */,
-				928986381D8FEAC30080F5D9 /* AppDelegate.h */,
-				928986391D8FEAC30080F5D9 /* AppDelegate.m */,
+				92C594BF1D94CDB30032C43F /* HSLineChartViewLine.h */,
+				92C594C01D94CDB30032C43F /* HSLineChartViewLine.m */,
+				928986461D8FEAC30080F5D9 /* Info.plist */,
+				928986431D8FEAC30080F5D9 /* LaunchScreen.storyboard */,
+				9289863E1D8FEAC30080F5D9 /* Main.storyboard */,
+				928986351D8FEAC30080F5D9 /* Supporting Files */,
 				9289863B1D8FEAC30080F5D9 /* ViewController.h */,
 				9289863C1D8FEAC30080F5D9 /* ViewController.m */,
-				9289863E1D8FEAC30080F5D9 /* Main.storyboard */,
-				928986411D8FEAC30080F5D9 /* Assets.xcassets */,
-				928986431D8FEAC30080F5D9 /* LaunchScreen.storyboard */,
-				928986461D8FEAC30080F5D9 /* Info.plist */,
-				928986351D8FEAC30080F5D9 /* Supporting Files */,
+				92C594C21D94DD970032C43F /* HSLineChartConstants.h */,
 			);
 			path = HSChartView;
 			sourceTree = "<group>";
@@ -167,6 +174,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				92C594C11D94CDB30032C43F /* HSLineChartViewLine.m in Sources */,
 				54D40CA21D916B2F00B75009 /* HSLineChartView.m in Sources */,
 				54D40CA61D916D7200B75009 /* CommonUtils.m in Sources */,
 				9289863D1D8FEAC30080F5D9 /* ViewController.m in Sources */,

@@ -7,6 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "HSLineChartConstants.h"
+#import "HSLineChartViewLine.h"
 
 @protocol HSLineChartViewDataSource,HSLineChartViewDelegate;
 
@@ -33,6 +35,8 @@
     @required
 - (NSInteger)chartView:(nonnull HSLineChartView *)chartView numberOfValueInLine:(NSInteger)line;
 - (nonnull NSValue *)chartView:(nonnull HSLineChartView *)chartView valueAtIndex:(NSInteger)index inLine:(NSInteger)line;
+- (nonnull HSLineChartViewLine *)chartView:(nonnull HSLineChartView *)chartView lineAtIndex:(NSInteger)index;
+
     @optional
     
 @end
