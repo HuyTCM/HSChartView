@@ -16,6 +16,8 @@
         _lineData = [lineData copy];
         _type = type;
         
+        _lineWidth = kDefaultLineWidth;
+        
         _rootPoint = CGPointZero;
         
         [self calMaxValue];
@@ -35,8 +37,8 @@
     }
 }
 
-- (CGLayerRef)createLayerInContextRef:(CGContextRef)context {
-    CGRect layerRect = CGRectMake(0, 0, self.maxXValue, self.maxYValue);
+- (CGLayerRef)createLineLayerWithHorizontalUnitWidth:(CGFloat)hw andVerticalUnitWidth:(CGFloat)vw inContextRef:(CGContextRef)context {
+    CGRect layerRect = CGRectMake(0, 0, self.rootPoint.y + self.maxXValue, self.rootPoint.x + self.maxYValue);
     
     CGPoint rootPoint = self.rootPoint;
     
@@ -48,8 +50,9 @@
     CGContextScaleCTM(layerContext, 1.0, -1.0);
     
     CGContextSetStrokeColorWithColor(layerContext, [self.lineColor CGColor]);
+    
     if (self.type == HSLineDashed) {
-        CGContextSetLineWidth(layerContext, kDefaultLineWidth);
+        CGContextSetLineWidth(layerContext, self.lineWidth);
         CGFloat ra[] = {4,2};
         CGContextSetLineDash(layerContext, 0.0, ra, 2);
     }
@@ -62,7 +65,7 @@
         NSValue *pointValue = [self.lineData objectAtIndex:i];
         CGPoint point = [pointValue CGPointValue];
         
-        CGPathAddLineToPoint(pathRef, nil, point.x, point.y);
+        CGPathAddLineToPoint(pathRef, nil, self.rootPoint.x + point.x, self.rootPoint.y + point.y);
     }
     CGContextAddPath(layerContext, pathRef);
     CGContextStrokePath(layerContext);

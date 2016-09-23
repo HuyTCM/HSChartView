@@ -30,13 +30,14 @@ typedef enum : NSUInteger {
 @property (strong, nonatomic) UIColor *lineColor;
 
 @property (nonatomic) CGPoint rootPoint; // root point of line in line chart, default {0,0}
+@property (nonatomic) CGFloat lineWidth;
 
 @property (nonatomic) CGFloat maxXValue; // max X value (horizontal value)
 @property (nonatomic) CGFloat maxYValue; // max Y value (vertical value)
 
 - (HSLineChartViewLine *)initWithData:(NSArray<NSValue *> *)lineData type:(HSLineType)type;
 
-- (CGLayerRef)createLayerInContextRef:(CGContextRef)context;
+- (CGLayerRef)createLineLayerWithHorizontalUnitWidth:(CGFloat)hw andVerticalUnitWidth:(CGFloat)vw inContextRef:(CGContextRef)context;
 
 @end
 

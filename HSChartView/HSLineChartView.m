@@ -19,8 +19,8 @@
     @property (nonatomic) CGPoint verticalLabelPoint;
     @property (nonatomic) CGPoint horizontalLabelPoint;
 
-    @property (nonatomic) CGFloat maxXValue;
-    @property (nonatomic) CGFloat maxYValue;
+    @property (nonatomic) CGFloat maxXLength;
+    @property (nonatomic) CGFloat maxYLength;
 
 @end
 
@@ -71,13 +71,15 @@
     while (numOfLine > 0) {
         HSLineChartViewLine *line = [self.dataSource chartView:self lineAtIndex:numOfLine];
         if (line) {
-            if (self.maxXValue < line.maxXValue) {
-                self.maxXValue = line.maxXValue;
+            if (self.maxXLength < line.maxXValue) {
+                self.maxXLength = line.maxXValue;
             }
-            if (self.maxYValue < line.maxYValue) {
-                self.maxYValue = line.maxYValue;
+            if (self.maxYLength < line.maxYValue) {
+                self.maxYLength = line.maxYValue;
             }
-            CGLayerRef lineLayer = [line createLayerInContextRef:context];
+            CGLayerRef lineLayer = [line createLineLayerWithHorizontalUnitWidth:self.horizontalUnitWidth
+                                                           andVerticalUnitWidth:self.verticalUnitWidth
+                                                                   inContextRef:context];
             CGContextDrawLayerAtPoint(context, CGPointMake(self.paddingLeft, self.rootPoint.y - line.maxYValue), lineLayer);
             CGLayerRelease(lineLayer);
         }
@@ -116,12 +118,12 @@
     // x axis
     // point x of X axis was substract to lineWidth to fill the space between two axises.
     CGContextMoveToPoint(context, rootPoint.x - self.lineWidth, rootPoint.y + axisMargin);
-    CGContextAddLineToPoint(context, self.maxXValue + self.paddingLeft + kDefaultPadding, self.bounds.size.height - self.paddingBottom + axisMargin);
+    CGContextAddLineToPoint(context, self.maxXLength + self.paddingLeft + kDefaultPadding, self.bounds.size.height - self.paddingBottom + axisMargin);
     CGContextDrawPath(context, kCGPathStroke);
     
     // y axis
     CGContextMoveToPoint(context, rootPoint.x - axisMargin, rootPoint.y);
-    CGContextAddLineToPoint(context, self.paddingLeft - axisMargin , rootPoint.y - (self.maxYValue + kDefaultPadding));
+    CGContextAddLineToPoint(context, self.paddingLeft - axisMargin , rootPoint.y - (self.maxYLength + kDefaultPadding));
     CGContextDrawPath(context, kCGPathStroke);
 }
 
@@ -135,14 +137,14 @@
     CGFloat fontSizeLabel = 4.0f;
     
     CGFloat currentX = self.rootPoint.x + hw; // from x line + 10
-    while (currentX < (self.rootPoint.x + self.maxXValue + hw)) {
+    while (currentX < (self.rootPoint.x + self.maxXLength + hw)) {
         CGContextMoveToPoint(context, currentX, self.rootPoint.y);
         CGPoint pt = CGContextGetPathCurrentPoint(context);
-        CGContextAddLineToPoint(context, pt.x, self.rootPoint.y - (self.maxYValue + vw));
+        CGContextAddLineToPoint(context, pt.x, self.rootPoint.y - (self.maxYLength + vw));
         CGContextDrawPath(context, kCGPathStroke);
         
         CGPoint labelPoint = CGPointMake(currentX, self.rootPoint.y + self.lineWidth * 2.5);
-        [self drawLabel:[NSString stringWithFormat:@"%d",(int) (currentX - self.rootPoint.x)] fontSize:fontSizeLabel atPoint:labelPoint onHorizontal:YES];
+        [self drawLabel:[NSString stringWithFormat:@"%d",(int) ((currentX - self.rootPoint.x)/hw)] fontSize:fontSizeLabel atPoint:labelPoint onHorizontal:YES];
         
         currentX += hw;
     }
@@ -150,14 +152,14 @@
     NSDictionary *labelAttributes = @{NSFontAttributeName:[UIFont systemFontOfSize:fontSizeLabel]};
     CGSize size = [[NSString stringWithFormat:@"%d", (int)self.bounds.size.width] sizeWithAttributes:labelAttributes];
     CGFloat currentY = self.rootPoint.y - vw; // from y line - 10
-    while (currentY > (self.rootPoint.y - self.maxYValue - vw)) {
+    while (currentY > (self.rootPoint.y - self.maxYLength - vw)) {
         CGContextMoveToPoint(context, self.rootPoint.x, currentY);
         CGPoint pt = CGContextGetPathCurrentPoint(context);
-        CGContextAddLineToPoint(context, self.rootPoint.x + self.maxXValue + vw, pt.y);
+        CGContextAddLineToPoint(context, self.rootPoint.x + self.maxXLength + vw, pt.y);
         CGContextDrawPath(context, kCGPathStroke);
         
         CGPoint labelPoint = CGPointMake((self.rootPoint.x - (size.width) < 0 ? 0 : self.rootPoint.x - (size.width)) - self.lineWidth * 1.5, currentY);
-        [self drawLabel:[NSString stringWithFormat:@"%d",(int) (self.rootPoint.y - currentY)] fontSize:fontSizeLabel atPoint:labelPoint onHorizontal:NO];
+        [self drawLabel:[NSString stringWithFormat:@"%d",(int) ((self.rootPoint.y - currentY)/vw)] fontSize:fontSizeLabel atPoint:labelPoint onHorizontal:NO];
         
         currentY -= vw;
     }

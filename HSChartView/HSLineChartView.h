@@ -33,8 +33,6 @@
 
 @protocol HSLineChartViewDataSource<NSObject>
     @required
-- (NSInteger)chartView:(nonnull HSLineChartView *)chartView numberOfValueInLine:(NSInteger)line;
-- (nonnull NSValue *)chartView:(nonnull HSLineChartView *)chartView valueAtIndex:(NSInteger)index inLine:(NSInteger)line;
 - (nonnull HSLineChartViewLine *)chartView:(nonnull HSLineChartView *)chartView lineAtIndex:(NSInteger)index;
 
     @optional
