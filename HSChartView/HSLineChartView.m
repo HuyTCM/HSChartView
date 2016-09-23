@@ -21,6 +21,8 @@
 
     @property (nonatomic) CGFloat maxXLength;
     @property (nonatomic) CGFloat maxYLength;
+    @property (nonatomic) CGFloat stepX;
+    @property (nonatomic) CGFloat stepY;
 
 @end
 
@@ -40,6 +42,8 @@
         self.lineWidth = kDefaultLineWidth;
         self.horizontalUnitWidth = self.verticalUnitWidth = kDefaultUnitWidth;
         self.axisMargin = self.lineWidth/2;
+        
+        self.stepX = 5;
     }
     [self setContentSize:frame.size];
     return self;
@@ -77,16 +81,16 @@
     while (numOfLine > 0) {
         HSLineChartViewLine *line = [self.dataSource chartView:self lineAtIndex:numOfLine];
         if (line) {
-            if (self.maxXLength < line.maxXValue) {
-                self.maxXLength = line.maxXValue;
+            if (self.maxXLength < (line.maxXValue * self.horizontalUnitWidth)) {
+                self.maxXLength = line.maxXValue * self.horizontalUnitWidth;
             }
-            if (self.maxYLength < line.maxYValue) {
-                self.maxYLength = line.maxYValue;
+            if (self.maxYLength < (line.maxYValue * self.verticalUnitWidth)) {
+                self.maxYLength = line.maxYValue * self.verticalUnitWidth;
             }
             CGLayerRef lineLayer = [line createLineLayerWithHorizontalUnitWidth:self.horizontalUnitWidth
                                                            andVerticalUnitWidth:self.verticalUnitWidth
                                                                    inContextRef:context];
-            CGContextDrawLayerAtPoint(context, CGPointMake(self.paddingLeft, self.rootPoint.y - line.maxYValue), lineLayer);
+            CGContextDrawLayerAtPoint(context, CGPointMake(self.paddingLeft, self.rootPoint.y - line.maxYValue * self.verticalUnitWidth), lineLayer);
             CGLayerRelease(lineLayer);
         }
         --numOfLine;
@@ -97,8 +101,8 @@
     CGContextSetLineWidth(context, self.lineWidth);
     
     [self drawAxisInRect:rect atRoot:self.rootPoint inContenxt:context];
-    [self drawSeparateLineWithHorizonralUnitWidth:self.horizontalUnitWidth
-                                verticalUnitWidth:self.verticalUnitWidth
+    [self drawSeparateLineWithHorizonralUnitWidth:self.horizontalUnitWidth stepX:self.stepX
+                                verticalUnitWidth:self.verticalUnitWidth stepY:self.stepY
                                         inContext:context];
 }
 
@@ -123,18 +127,27 @@
     CGFloat axisMargin = self.lineWidth / 2;
     // x axis
     // point x of X axis was substract to lineWidth to fill the space between two axises.
-    CGContextMoveToPoint(context, rootPoint.x - self.lineWidth, rootPoint.y + axisMargin);
-    CGContextAddLineToPoint(context, self.maxXLength + self.paddingLeft + kDefaultPadding, self.bounds.size.height - self.paddingBottom + axisMargin);
+    CGPoint rootXPoint = CGPointMake(rootPoint.x - self.lineWidth, rootPoint.y + axisMargin);
+    CGPoint destXPoint = CGPointMake(self.maxXLength + self.paddingLeft + kDefaultPadding,
+                                     self.bounds.size.height - self.paddingBottom + axisMargin);
+    CGContextMoveToPoint(context, rootXPoint.x, rootXPoint.y);
+    CGContextAddLineToPoint(context, destXPoint.x, destXPoint.y);
     CGContextDrawPath(context, kCGPathStroke);
     
     // y axis
-    CGContextMoveToPoint(context, rootPoint.x - axisMargin, rootPoint.y);
-    CGContextAddLineToPoint(context, self.paddingLeft - axisMargin , rootPoint.y - (self.maxYLength + kDefaultPadding));
+    CGPoint rootYPoint = CGPointMake(rootPoint.x - axisMargin, rootPoint.y);
+    CGPoint destYPoint = CGPointMake(self.paddingLeft - axisMargin,
+                                     rootPoint.y - (self.maxYLength + kDefaultPadding));
+    CGContextMoveToPoint(context, rootYPoint.x, rootYPoint.y);
+    CGContextAddLineToPoint(context, destYPoint.x, destYPoint.y);
     CGContextDrawPath(context, kCGPathStroke);
 }
 
-- (void)drawSeparateLineWithHorizonralUnitWidth:(CGFloat)hw verticalUnitWidth:(CGFloat)vw inContext:(CGContextRef)context {
-    CGContextSetStrokeColorWithColor(context, CGColorCreateCopyWithAlpha([self.axisColor CGColor], 0.3f));
+- (void)drawSeparateLineWithHorizonralUnitWidth:(CGFloat)hw stepX:(CGFloat)stepX
+                              verticalUnitWidth:(CGFloat)vw stepY:(CGFloat)stepY
+                                      inContext:(CGContextRef)context {
+    CGColorRef lineColor = CGColorCreateCopyWithAlpha([self.axisColor CGColor], 0.3f);
+    CGContextSetStrokeColorWithColor(context, lineColor);
     CGContextSetLineWidth(context, self.lineWidth/10.0f);
     
     CGFloat ra[] = {1,1};
@@ -144,17 +157,21 @@
     
     CGFloat currentX = self.rootPoint.x + hw; // from x line + 10
     while (currentX < (self.rootPoint.x + self.maxXLength + hw)) {
-        CGContextMoveToPoint(context, currentX, self.rootPoint.y);
-        CGPoint pt = CGContextGetPathCurrentPoint(context);
-        CGContextAddLineToPoint(context, pt.x, self.rootPoint.y - (self.maxYLength + vw));
-        CGContextDrawPath(context, kCGPathStroke);
-        
-        CGPoint labelPoint = CGPointMake(currentX, self.rootPoint.y + self.lineWidth * 2.5);
-        
-        [self drawLabel:[NSString stringWithFormat:@"%d",(int) ((currentX - self.rootPoint.x)/hw)]
-               fontSize:fontSizeLabel
-                atPoint:labelPoint
-           onHorizontal:YES];
+        int unitX = ((currentX - self.rootPoint.x)/hw);
+        if (unitX >= (int)self.stepX && (unitX % (int)self.stepX) == 0) {
+            CGContextMoveToPoint(context, currentX, self.rootPoint.y);
+            CGPoint pt = CGContextGetPathCurrentPoint(context);
+            CGContextAddLineToPoint(context, pt.x, self.rootPoint.y - (self.maxYLength + vw));
+            CGContextDrawPath(context, kCGPathStroke);
+            
+            CGPoint labelPoint = CGPointMake(currentX, self.rootPoint.y + self.lineWidth * 2.5);
+            
+            NSString *horizontalUnitLabel = [NSString stringWithFormat:@"%d",unitX];
+            [self drawLabel:horizontalUnitLabel
+                   fontSize:fontSizeLabel
+                    atPoint:labelPoint
+               onHorizontal:YES];
+        }
         
         currentX += hw;
     }
@@ -163,17 +180,21 @@
     CGSize size = [[NSString stringWithFormat:@"%d", (int)self.bounds.size.width] sizeWithAttributes:labelAttributes];
     CGFloat currentY = self.rootPoint.y - vw; // from y line - 10
     while (currentY > (self.rootPoint.y - self.maxYLength - vw)) {
-        CGContextMoveToPoint(context, self.rootPoint.x, currentY);
-        CGPoint pt = CGContextGetPathCurrentPoint(context);
-        CGContextAddLineToPoint(context, self.rootPoint.x + self.maxXLength + vw, pt.y);
-        CGContextDrawPath(context, kCGPathStroke);
-        
-        CGPoint labelPoint = CGPointMake((self.rootPoint.x - (size.width) < 0 ? 0 : self.rootPoint.x - (size.width)) - self.lineWidth * 1.5, currentY);
-        
-        [self drawLabel:[NSString stringWithFormat:@"%d",(int) ((self.rootPoint.y - currentY)/vw)]
-               fontSize:fontSizeLabel
-                atPoint:labelPoint
-           onHorizontal:NO];
+        int unitY = ((self.rootPoint.y - currentY)/vw);
+        if (unitY >= (int)self.stepX && (unitY % (int)self.stepX) == 0) {
+            CGContextMoveToPoint(context, self.rootPoint.x, currentY);
+            CGPoint pt = CGContextGetPathCurrentPoint(context);
+            CGContextAddLineToPoint(context, self.rootPoint.x + self.maxXLength + vw, pt.y);
+            CGContextDrawPath(context, kCGPathStroke);
+            
+            CGPoint labelPoint = CGPointMake((self.rootPoint.x - (size.width) < 0 ? 0 : self.rootPoint.x - (size.width)) - self.lineWidth * 1.5, currentY);
+            
+            NSString *verticalUnitLabel = [NSString stringWithFormat:@"%d",unitY];
+            [self drawLabel:verticalUnitLabel
+                   fontSize:fontSizeLabel
+                    atPoint:labelPoint
+               onHorizontal:NO];
+        }
         
         currentY -= vw;
     }

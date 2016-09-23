@@ -38,7 +38,7 @@
 }
 
 - (CGLayerRef)createLineLayerWithHorizontalUnitWidth:(CGFloat)hw andVerticalUnitWidth:(CGFloat)vw inContextRef:(CGContextRef)context {
-    CGRect layerRect = CGRectMake(0, 0, self.rootPoint.y + self.maxXValue, self.rootPoint.x + self.maxYValue);
+    CGRect layerRect = CGRectMake(0, 0, self.rootPoint.y + (self.maxXValue * hw), self.rootPoint.x + (self.maxYValue * vw));
     
     CGPoint rootPoint = self.rootPoint;
     
@@ -65,7 +65,7 @@
         NSValue *pointValue = [self.lineData objectAtIndex:i];
         CGPoint point = [pointValue CGPointValue];
         
-        CGPathAddLineToPoint(pathRef, nil, self.rootPoint.x + point.x, self.rootPoint.y + point.y);
+        CGPathAddLineToPoint(pathRef, nil, self.rootPoint.x + (point.x * hw), self.rootPoint.y + (point.y * vw));
     }
     CGContextAddPath(layerContext, pathRef);
     CGContextStrokePath(layerContext);
