@@ -53,8 +53,14 @@
     CGContextSetFillColorWithColor(context, [self.backgroundColor CGColor]);
     CGContextFillRect(context, self.bounds);
     
-    CGRect verticalLabelRect = [self drawLabel:self.verticalLabel fontSize:self.fontSize atPoint:self.verticalLabelPoint onHorizontal:NO];
-    CGRect horizontalLabelRect = [self drawLabel:self.horizontalLabel fontSize:self.fontSize atPoint:self.horizontalLabelPoint onHorizontal:YES];
+    CGRect verticalLabelRect = [self drawLabel:self.verticalLabel
+                                      fontSize:self.fontSize
+                                       atPoint:self.verticalLabelPoint
+                                  onHorizontal:NO];
+    CGRect horizontalLabelRect = [self drawLabel:self.horizontalLabel
+                                        fontSize:self.fontSize
+                                         atPoint:self.horizontalLabelPoint
+                                    onHorizontal:YES];
     
     self.paddingLeft = verticalLabelRect.size.width + kDefaultPadding + self.lineWidth;
     self.paddingBottom = horizontalLabelRect.size.height + kDefaultPadding + self.lineWidth;
@@ -144,7 +150,11 @@
         CGContextDrawPath(context, kCGPathStroke);
         
         CGPoint labelPoint = CGPointMake(currentX, self.rootPoint.y + self.lineWidth * 2.5);
-        [self drawLabel:[NSString stringWithFormat:@"%d",(int) ((currentX - self.rootPoint.x)/hw)] fontSize:fontSizeLabel atPoint:labelPoint onHorizontal:YES];
+        
+        [self drawLabel:[NSString stringWithFormat:@"%d",(int) ((currentX - self.rootPoint.x)/hw)]
+               fontSize:fontSizeLabel
+                atPoint:labelPoint
+           onHorizontal:YES];
         
         currentX += hw;
     }
@@ -159,7 +169,11 @@
         CGContextDrawPath(context, kCGPathStroke);
         
         CGPoint labelPoint = CGPointMake((self.rootPoint.x - (size.width) < 0 ? 0 : self.rootPoint.x - (size.width)) - self.lineWidth * 1.5, currentY);
-        [self drawLabel:[NSString stringWithFormat:@"%d",(int) ((self.rootPoint.y - currentY)/vw)] fontSize:fontSizeLabel atPoint:labelPoint onHorizontal:NO];
+        
+        [self drawLabel:[NSString stringWithFormat:@"%d",(int) ((self.rootPoint.y - currentY)/vw)]
+               fontSize:fontSizeLabel
+                atPoint:labelPoint
+           onHorizontal:NO];
         
         currentY -= vw;
     }
